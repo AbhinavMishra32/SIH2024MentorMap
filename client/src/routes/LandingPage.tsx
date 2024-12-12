@@ -374,7 +374,7 @@ const MentorMapFeatures: React.FC = () => {
           <Link to="#" className="text-gray-600 hover:text-white transition-colors">Careers</Link>
           <Link to="#" className="text-gray-600 hover:text-white transition-colors">Contact</Link>
         </div>
-          </div>
+          </div> 
           <div className="mt-8 text-center text-gray-200">
         &copy; {new Date().getFullYear()} MentorMap. All rights reserved.
           </div>
