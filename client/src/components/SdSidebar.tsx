@@ -45,8 +45,13 @@ const studentItems = [
         icon: RouteIcon,
     },
     {
-        title:  "AI Training",
-        url: "/aitraining",
+        title: "Know Your Course",
+        url: "/coursefinder",
+        icon: GraduationCap,
+    },
+    {
+        title:  "Personality Development",
+        url: "/aitraining/interview-prep",
         icon: Dumbbell,
     },
     {
@@ -54,26 +59,21 @@ const studentItems = [
         url: "/careerai",
         icon: Lightbulb,
     },
-    {
-        title: "Find Scholarships",
-        url: "/scholarships",
-        icon: GraduationCap
-    },
-    {
-        title: "Exlore Careers",
-        url: "/explore",
-        icon: Briefcase,
-    },
+    // {
+    //     title: "Exlore Careers",
+    //     url: "/explore",
+    //     icon: Briefcase,
+    // },
     {
         title: "AI Counsellor",
         url: "/ai",
         icon: StarsIcon,
     },
-    {
-        title: "Settings",
-        url: "#",
-        icon: Settings,
-    },
+    // {
+    //     title: "Settings",
+    //     url: "#",
+    //     icon: Settings,
+    // },
 ]
 
 const counsellorItems = [

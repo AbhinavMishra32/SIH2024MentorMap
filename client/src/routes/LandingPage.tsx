@@ -2,13 +2,20 @@ import { useEffect, useRef, useState } from 'react'
 import { motion, useScroll, useTransform, useAnimate, stagger } from 'framer-motion'
 import { Button } from "@/components/ui/button"
 import landingHeroImage from '../assets/landing_hero.png';
-// import Image from 'next/image'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { BarChart, BookOpen, Check, CircleDot, Video, Map, Search, MessageSquare } from 'lucide-react';
+import AIRoadmap from '../assets/video1.mp4';
+import ChatWithCounsellors from '@/components/LandingPage/ChatWithCounsellors';
+import AIRoadmaps from '@/components/LandingPage/AIRoadmaps';
+import ExploreCareersPaths from '@/components/LandingPage/ExploreCareersPaths';
+import InterviewAnalysis from '@/components/LandingPage/InterviewAnalysis';
+// import "./assets/fonts/Rubik_Scribble/RubikScribble-Regular.ttf";
+
 
 export default function Home() {
   const targetRef = useRef<HTMLDivElement>(null)
   const [scrollY, setScrollY] = useState<number>(0);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -61,7 +68,7 @@ export default function Home() {
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.5, delay: 0.4 }}
         >
-        <Button variant="default" className={`bg-yellow-400 rounded-full text-black hover:bg-yellow-500/90 ${scrollY > 0 ? '' : 'shadow-xl'} transition-all duration-1000`}>Dashboard</Button>
+        <Button onClick = {() =>navigate('/signin')}variant="default" className={`bg-yellow-400 rounded-full text-black hover:bg-yellow-500/90 ${scrollY > 0 ? '' : 'shadow-xl'} transition-all duration-1000`}>Dashboard</Button>
         </motion.div>
       </nav>
       </header>
@@ -80,12 +87,12 @@ export default function Home() {
               <span className="text-sm font-medium bg-black/5 px-4 py-2 rounded-full">
                 Career Guidance Platform
               </span>
-              <h1 className="text-5xl lg:text-6xl font-bold leading-tight text-black">
+              <h1 className="text-5xl lg:text-6xl font-bold leading-tight text-black" style={{fontFamily: "PangolinRegular"}}>
                 Navigate Your Future with Confidence
               </h1>
-              <p className="text-black/60 text-lg max-w-xl">
-                Empowering high school students to make informed career decisions through personalized counseling, AI-powered roadmaps, and comprehensive career exploration tools.
-              </p>
+                <p className="text-black/60 text-lg max-w-xl">
+                Guidance For Growth, Support For Success
+                </p>
               
               <div className="flex flex-wrap gap-4">
                 <Link to='/signin'>
@@ -158,25 +165,41 @@ export default function Home() {
                 </div>
               </motion.div>
               <motion.div
-                initial={{ opacity: 0, x: 50 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.6 }}
-                className="relative"
-              >
-                <div className="relative">
-                  <div className="absolute -right-20 -top-36 w-[500px] h-[500px] rounded-full bg-[#FFD84D] shadow-xl" />
-                  <img
-                  src={landingHeroImage}
-                  alt="Student"
-                  className="relative z-10 w-full h-auto -top-20 max-w-[500px] mx-auto"
-                  />
-                  <div className="absolute top-10 right-10 bg-white p-3 rounded-full shadow-lg z-20">
-                  <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M12 15L8 11H16L12 15Z" fill="currentColor" />
-                  </svg>
-                  </div>
-                </div>
-              </motion.div>
+      initial={{ opacity: 0, y: 50 }}
+      animate={{ 
+        opacity: 1, 
+        y: [0, -20, 0],
+        transition: {
+          y: {
+            repeat: Infinity,
+            duration: 4,
+            ease: "easeInOut"
+          },
+          opacity: { duration: 0.6 }
+        }
+      }}
+      className="relative"
+    >
+      <div className="relative">
+        <motion.div 
+          className="absolute right-20 -top-32 w-[400px] h-[400px] rounded-full bg-gradient-to-t from-yellow-500 to-yellow-200 shadow-xl"
+          animate={{
+            scale: [1, 1.05, 1],
+            transition: {
+              repeat: Infinity,
+              duration: 4,
+              ease: "easeInOut"
+            }
+          }}
+        />
+        <img
+          src={landingHeroImage}
+          alt="Student"
+          className="relative z-10 h-auto -top-40 w-[800px] mx-auto"
+        />
+      </div>
+    </motion.div>
+  )
             </div>
           </div>
           <div className="absolute bottom-0 left-0 right-0 w-full">
@@ -241,83 +264,46 @@ export default function Home() {
       </div>
     </section>
 
-        <section className="py-20 bg-white">
-          <div className="container mx-auto px-6">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-              <div>
-                <h2 className="text-3xl font-bold mb-8">Our dales tryring</h2>
-                <div className="grid grid-cols-2 gap-6">
-                  <ul className="space-y-4">
-                    <li className="flex items-center gap-2">
-                      <div className="w-2 h-2 bg-black rounded-full" />
-                      New Dopiter
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <div className="w-2 h-2 bg-black rounded-full" />
-                      Themstican Leonhing
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <div className="w-2 h-2 bg-black rounded-full" />
-                      Eeltsere Steries
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <div className="w-2 h-2 bg-black rounded-full" />
-                      Fterng yreswst
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <div className="w-2 h-2 bg-black rounded-full" />
-                      Isustry ot forclestisry
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <div className="w-2 h-2 bg-black rounded-full" />
-                      Owostrt Stetislogs
-                    </li>
-                  </ul>
-                  <ul className="space-y-4">
-                    <li className="flex items-center gap-2">
-                      <div className="w-2 h-2 bg-black rounded-full" />
-                      Cost Ozsse
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <div className="w-2 h-2 bg-black rounded-full" />
-                      Keerv fo heotlotis
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <div className="w-2 h-2 bg-black rounded-full" />
-                      Mtregstrolod Fosrtes
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <div className="w-2 h-2 bg-black rounded-full" />
-                      Fewgh nwectd pelsng
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <div className="w-2 h-2 bg-black rounded-full" />
-                      Heel Leny figwees
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <div className="w-2 h-2 bg-black rounded-full" />
-                      Heently Lostletents
-                    </li>
-                  </ul>
+    
+
+    <section className="py-16 bg-gray-100">
+      <div className="container mx-auto px-4">
+        <div className="flex flex-col lg:flex-row items-center justify-between">
+          {/* Left column: Heading and subheading */}
+          <div className="lg:w-1/2 mb-8 lg:mb-0">
+            <h2 className="text-4xl lg:text-5xl font-bold mb-4 leading-tight">
+              
+              <span className="block text-yellow-500">AI Powered Roadmaps</span>
+            </h2>
+            <p className="text-xl text-gray-600 mb-6">
+              Create custom career roadmaps from your current position to your desired goal using advanced AI technology.
+            </p>
+            <button className="bg-yellow-500 text-white font-semibold py-3 px-6 rounded-full hover:bg-yellow-600 transition duration-300 ease-in-out transform hover:scale-105">
+              Learn More
+            </button>
+          </div>
+
+              <div className="lg:w-1/2">
+                <div className="aspect-w-16 aspect-h-9 bg-gray-200 rounded-lg shadow-lg overflow-hidden">
+                  <div className="flex items-center justify-center h-full">
+                    <span className="text-gray-500 text-lg">
+                      <video
+                        src={AIRoadmap}
+                        autoPlay
+                        loop
+                        muted
+                        style={{ width: "100%", height: "auto" }}
+                      />
+                    </span>
+                  </div>
                 </div>
               </div>
-              <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.5 }}
-                className="relative"
-              >
-                {/* <Image
-                  src="/placeholder.svg"
-                  alt="Interface illustration"
-                  width={600}
-                  height={400}
-                  className="object-contain"
-                /> */}
-              </motion.div>
             </div>
           </div>
         </section>
+
+
+        <MentorMapFeatures />
       </main>
     </div>
   )
@@ -337,6 +323,63 @@ function TimelineItem({ icon, title, description }: {
         <h3 className="font-semibold text-black/80">{title}</h3>
         <p className="text-black/50">{description}</p>
       </div>
+    </div>
+  )
+}
+const MentorMapFeatures: React.FC = () => {
+  return (
+    <div className="bg-white">
+      <motion.div
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.5 }}
+      >
+        <ChatWithCounsellors />
+      </motion.div>
+      <motion.div
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.5 }}
+      >
+        <AIRoadmaps />
+      </motion.div>
+      <motion.div
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.5 }}
+      >
+        <ExploreCareersPaths />
+      </motion.div>
+      <motion.div
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.5 }}
+      >
+        {/* <InterviewAnalysis /> */}
+      </motion.div>
+      <footer className="bg-gray-200 text-black py-8">
+        <div className="container mx-auto px-6">
+          <div className="flex flex-col md:flex-row justify-between items-center">
+        <div className="mb-4 md:mb-0">
+          <h3 className="text-xl font-bold">MentorMap</h3>
+          <p className="text-gray-600">Navigate Your Future with Confidence</p>
+        </div>
+        <div className="flex space-x-4">
+          <Link to="#" className="text-gray-600 hover:text-white transition-colors">About</Link>
+          <Link to="#" className="text-gray-600 hover:text-white transition-colors">Explore</Link>
+          <Link to="#" className="text-gray-600 hover:text-white transition-colors">Careers</Link>
+          <Link to="#" className="text-gray-600 hover:text-white transition-colors">Contact</Link>
+        </div>
+          </div>
+          <div className="mt-8 text-center text-gray-200">
+        &copy; {new Date().getFullYear()} MentorMap. All rights reserved.
+          </div>
+        </div>
+      </footer>
     </div>
   )
 }

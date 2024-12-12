@@ -38,3 +38,34 @@ export interface MindMapEdge {
   }
 }
 
+
+
+export interface Scholarship {
+  name: string
+  amount: number
+}
+
+export interface Alternative {
+  name: string
+  provider: string
+  cost: number
+  duration: string
+}
+
+export interface Course {
+  name: string
+  description: string
+  provider: string
+  cost: number
+  duration: string
+  careerOutcome: string
+  financialFit: string
+  scholarships: Scholarship[]
+  alternatives: Alternative[]
+}
+
+export interface Recommendations {
+  courses: Course[]
+  analysis: string
+}
+

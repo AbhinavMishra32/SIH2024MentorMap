@@ -2,20 +2,20 @@ import 'dotenv/config';
 import express, { NextFunction, Request, Response } from 'express';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
-// import userRouter from './routes/user.js';
-// import authRouter from './routes/auth.js';
-// import lessonRouter from './routes/lesson.js';
-// import quizRouter from './routes/quiz.js';
-// import aiRouter from './routes/ai.js';
-// import careersRouter from './routes/careers.js';
-// import chatRouter from './routes/chat.js';
-// import counsellorRouter from './routes/counsellor.js';
-// import studentRouter from './routes/student.js';
-// import jwt, { JwtPayload } from 'jsonwebtoken';
-// import { JWT_SECRET } from './config.js';
+import userRouter from './routes/user.js';
+import authRouter from './routes/auth.js';
+import lessonRouter from './routes/lesson.js';
+import quizRouter from './routes/quiz.js';
+import aiRouter from './routes/ai.js';
+import careersRouter from './routes/careers.js';
+import chatRouter from './routes/chat.js';
+import counsellorRouter from './routes/counsellor.js';
+import studentRouter from './routes/student.js';
+import jwt, { JwtPayload } from 'jsonwebtoken';
+import { JWT_SECRET } from './config.js';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
-// import prisma from './db.js';
+import prisma from './db.js';
 
 const CLIENT_URL = process.env.CLIENT_URL;
 if (!CLIENT_URL) {
@@ -133,12 +133,35 @@ app.get('/', async (req: Request, res: Response) => {
     });
 });
 
-// app.use('/api/user', authRequire, userRouter);
-// app.use('/api/lesson', authRequire, lessonRouter);
-// app.use('/api/quiz', authRequire, quizRouter);
-// app.use('/api/auth', authRouter);
-// app.use('/api/ai', authRequire, aiRouter);
-// app.use('/api/careers', careersRouter);
-// app.use('/api/chat', authRequire, chatRouter);
-// app.use('/api/counsellor', authRequire, counsellorRouter);
-// app.use('/api/student', authRequire, studentRouter);
+app.use('/api/user', authRequire, userRouter);
+app.use('/api/lesson', authRequire, lessonRouter);
+app.use('/api/quiz', authRequire, quizRouter);
+app.use('/api/auth', authRouter);
+app.use('/api/ai', authRequire, aiRouter);
+app.use('/api/careers', careersRouter);
+app.use('/api/chat', authRequire, chatRouter);
+app.use('/api/counsellor', authRequire, counsellorRouter);
+app.use('/api/student', authRequire, studentRouter);
+
+
+
+app.get('/api/approve', async (req: ReqWithUser, res: Response) => { 
+    try {
+        const counsellors = await prisma.counsellor.findMany({
+            where: {
+                isVerified: false
+            }
+        });
+
+        res.status(200).json({
+            success: true,
+            counsellors
+        });
+    } catch (error) {
+        console.log("Error in counsellor router GET /approve : ", error);
+        res.status(500).json({
+            success: false,
+            message: "Internal server error"
+        });
+    }
+})

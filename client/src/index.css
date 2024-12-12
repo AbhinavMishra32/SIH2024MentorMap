@@ -118,3 +118,8 @@
   border-color: hsl(var(--primary));
   box-shadow: 0 12px 24px -4px rgba(0, 0, 0, 0.08);
 }
+@font-face{
+  font-family: "PangolinRegular";
+  src:local("Pangolin-Regular"),
+  url('./assets/fonts/Pangolin-Regular.ttf') 
+}

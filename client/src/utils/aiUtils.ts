@@ -1,5 +1,5 @@
 import { GoogleGenerativeAI, HarmBlockThreshold, HarmCategory, SchemaType } from '@google/generative-ai'
-import { CareerInfo, QuestionData } from '../types'
+import { CareerInfo, QuestionData, Recommendations } from '../types'
 import { initialEdges, initialNodes } from '@/data/mindmap-data'
 
 const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY as string
@@ -266,3 +266,79 @@ export async function generateMindMapData(currentState: string, desiredOutcome: 
   }
 }
 
+
+export async function generateRecommendations(careerPath: string, financialCondition: string): Promise<Recommendations> {
+  const genAI = new GoogleGenerativeAI(GEMINI_API_KEY!)
+
+  const schema = {
+    type: SchemaType.OBJECT,
+    properties: {
+      courses: {
+        type: SchemaType.ARRAY,
+        items: {
+          type: SchemaType.OBJECT,
+          properties: {
+            name: { type: SchemaType.STRING },
+            description: { type: SchemaType.STRING },
+            provider: { type: SchemaType.STRING },
+            cost: { type: SchemaType.NUMBER },
+            duration: { type: SchemaType.STRING },
+            careerOutcome: { type: SchemaType.STRING },
+            financialFit: { type: SchemaType.STRING },
+            scholarships: {
+              type: SchemaType.ARRAY,
+              items: {
+                type: SchemaType.OBJECT,
+                properties: {
+                  name: { type: SchemaType.STRING },
+                  amount: { type: SchemaType.NUMBER },
+                },
+              },
+            },
+            alternatives: {
+              type: SchemaType.ARRAY,
+              items: {
+                type: SchemaType.OBJECT,
+                properties: {
+                  name: { type: SchemaType.STRING },
+                  provider: { type: SchemaType.STRING },
+                  cost: { type: SchemaType.NUMBER },
+                  duration: { type: SchemaType.STRING },
+                },
+              },
+            },
+          },
+          required: [
+            "name", "description", "provider", "cost", "duration",
+            "careerOutcome", "financialFit", "scholarships", "alternatives"
+          ],
+        },
+      },
+      analysis: { type: SchemaType.STRING },
+    },
+    required: ["courses", "analysis"],
+  }
+
+  const model = genAI.getGenerativeModel({
+    model: "gemini-1.5-flash",
+    generationConfig: {
+      responseMimeType: "application/json",
+      responseSchema: schema,
+    },
+  })
+
+  const prompt = `Given the following career path and financial condition, provide professional course recommendations:
+  Career Path: ${careerPath}
+  Financial Condition: ${financialCondition}
+  
+  Provide a detailed analysis and at least 5 professional course in India (government recognized degrees / courses / etc), dont tell any online courese!, recommendations (such as B.Tech, M.Tech, MD, MBBS, etc.) based on the user's career path and financial condition. Give amount of money required for course in Indian rupees. Ensure the courses are diverse and align with different aspects of the career path. Include specific financial fit assessments for each course and provide alternatives.`
+
+  try {
+    const result = await model.generateContent(prompt)
+    const generatedRecommendations = JSON.parse(result.response.text())
+    return generatedRecommendations as Recommendations
+  } catch (error) {
+    console.error("Error generating recommendations:", error)
+    throw error
+  }
+}

@@ -19,6 +19,7 @@ export default function SignInUpPage() {
     const [username, setUsername] = useState("")
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
+    const [onboarded, setOnboarded] = useState();
     const [accountType, setAccountType] = useState<AccountType>("student")
     const [isLoading, setIsLoading] = useState(false)
     const [error, setError] = useState<string | null>(null)
@@ -54,6 +55,11 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
                 isSignUp
             })
             console.log("Response from signup/signin: ", response)
+            const counsellorOnboarded = response.data.counsellor?.onboarded;
+            const studentOnboarded = response.data.student?.onboarded;
+            console.log(studentOnboarded);
+            setOnboarded(counsellorOnboarded || studentOnboarded);
+            console.log("Onboarded: ", counsellorOnboarded || studentOnboarded)
             if (!isSignUp) {
                 console.log("Token: ", response.data.token)
                 document.cookie = `userToken=${response.data.token}; path=/; max-age=604800; samesite=strict`
@@ -63,7 +69,11 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
                 description: `Welcome${isSignUp ? ` ${accountType}` : ""}!`,
             })
             // Uncomment and modify as needed for navigation after successful sign-in/up
-            navigate(`/onboarding/${accountType}`)
+            if(onboarded){
+                navigate('/dashboard');
+            }else{
+                navigate(`/onboarding/${accountType}`)
+            }
         } catch (error: any) {
             console.log("Error while signup/signin: ", error)
             setError(
