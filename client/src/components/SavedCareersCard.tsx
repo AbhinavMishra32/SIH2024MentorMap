@@ -4,16 +4,28 @@ import { motion } from 'framer-motion'
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Bookmark } from 'lucide-react'
+import { useEffect, useState } from 'react'
 
-const savedCareers = [
-  { id: 1, name: "AI Specialist", category: "Technology" },
-  { id: 2, name: "Cybersecurity Analyst", category: "Technology" },
-  { id: 3, name: "Renewable Energy Engineer", category: "Engineering" },
-  { id: 4, name: "Biotechnology Researcher", category: "Science" },
-  { id: 5, name: "UX Designer", category: "Design" },
-]
+const savedCareers = localStorage.getItem('savedCareers') || [];
+
+console.log("savedCareers", savedCareers)
+
+interface Career {
+  id: number
+  title: string
+  trend: string
+}
 
 export default function SavedCareersCard() {
+  const [savedCareers, setSavedCareers] = useState<Career[]>([])
+
+  useEffect(() => {
+    const storedCareers = localStorage.getItem('savedCareers')
+    if (storedCareers) {
+      setSavedCareers(JSON.parse(storedCareers))
+    }
+  }, [])
+
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.9 }}
@@ -37,9 +49,9 @@ export default function SavedCareersCard() {
                 transition={{ duration: 0.3, delay: index * 0.1 }}
                 className="flex items-center justify-between"
               >
-                <span className="text-sm font-medium">{career.name}</span>
+                <span className="text-sm font-medium">{career.title}</span>
                 <Badge variant="outline" className="bg-yellow-100 text-yellow-800">
-                  {career.category}
+                  {career.trend}
                 </Badge>
               </motion.li>
             ))}

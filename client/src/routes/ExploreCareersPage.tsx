@@ -186,12 +186,24 @@ export default function ExploreCareersPage() {
   )
 
   const toggleSaveCareer = (career) => {
-    setSavedCareers(prev =>
-      prev.some(c => c.id === career.id)
+    setSavedCareers(prev => {
+      const newSavedCareers = prev.some(c => c.id === career.id)
         ? prev.filter(c => c.id !== career.id)
-        : [...prev, career]
-    )
+        : [...prev, career];
+      
+      // Save to local storage
+      localStorage.setItem('savedCareers', JSON.stringify(newSavedCareers));
+      
+      return newSavedCareers;
+    });
   }
+
+  useEffect(() => {
+    const savedCareersFromStorage = localStorage.getItem('savedCareers');
+    if (savedCareersFromStorage) {
+      setSavedCareers(JSON.parse(savedCareersFromStorage));
+    }
+  }, []);
 
   useEffect(() => {
     const fetchCareers = async () => {
@@ -544,3 +556,4 @@ export default function ExploreCareersPage() {
     </div >
   )
 }
+
