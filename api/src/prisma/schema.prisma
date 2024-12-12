@@ -27,6 +27,7 @@ model Student {
   counsellingReason String?
   completedQuizzes  Quiz[]
   completedLessons  Lesson[]
+  savedCareers      String[]
 
   chats Chat[]
 }

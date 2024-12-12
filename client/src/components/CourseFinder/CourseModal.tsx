@@ -1,15 +1,19 @@
-import { useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+'use client'
+
+import { motion } from 'framer-motion'
+import { Dialog } from '@headlessui/react'
+import { X, Clock, Building2, IndianRupee, GraduationCap, Star, Brain } from 'lucide-react'
+import { Button } from "@/components/ui/button"
 
 interface Course {
   name: string
   description: string
-  eligibility: string
-  cost: string
+  cost: number
   duration: string
   provider: string
-  careerOutcome: string
-  alternatives: { name: string; provider: string; cost: string }[]
+  field: string
+  rating: number
+  learningStyle: string
 }
 
 interface CourseModalProps {
@@ -17,83 +21,105 @@ interface CourseModalProps {
   onClose: () => void
 }
 
-export default function CourseModal({ course, onClose }: CourseModalProps) {
-  const [showAlternatives, setShowAlternatives] = useState(false)
+const overlayVariants = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1 },
+}
 
+const modalVariants = {
+  hidden: { opacity: 0, scale: 0.95, y: 20 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    y: 0,
+    transition: {
+      type: "spring",
+      stiffness: 300,
+      damping: 30,
+    },
+  },
+}
+
+export default function CourseModal({ course, onClose }: CourseModalProps) {
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      onClick={onClose}
-      className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
-    >
+    <Dialog open={true} onClose={onClose} className="fixed inset-0 z-50 overflow-y-auto">
       <motion.div
-        initial={{ scale: 0.9, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        exit={{ scale: 0.9, opacity: 0 }}
-        onClick={(e) => e.stopPropagation()}
-        className="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto"
-      >
-        <h2 className="text-2xl font-bold mb-4">{course.name}</h2>
-        <p className="text-gray-600 mb-4">{course.description}</p>
-        <div className="grid grid-cols-2 gap-4 mb-4">
-          <div>
-            <h3 className="font-semibold">Provider</h3>
-            <p>{course.provider}</p>
-          </div>
-          <div>
-            <h3 className="font-semibold">Duration</h3>
-            <p>{course.duration}</p>
-          </div>
-          <div>
-            <h3 className="font-semibold">Cost</h3>
-            <p className="text-yellow-500 font-bold">{course.cost}</p>
-          </div>
-          <div>
-            <h3 className="font-semibold">Eligibility</h3>
-            <p>{course.eligibility}</p>
-          </div>
-        </div>
-        <div className="mb-4">
-          <h3 className="font-semibold">Career Outcome</h3>
-          <p>{course.careerOutcome}</p>
-        </div>
-        <div className="flex justify-between">
-          <button
-            onClick={() => setShowAlternatives(!showAlternatives)}
-            className="bg-yellow-400 hover:bg-yellow-500 text-white font-bold py-2 px-4 rounded transition-colors"
-          >
-            {showAlternatives ? 'Hide Alternatives' : 'Show Alternatives'}
-          </button>
-          <button
-            onClick={onClose}
-            className="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded transition-colors"
-          >
-            Close
-          </button>
-        </div>
-        <AnimatePresence>
-          {showAlternatives && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              exit={{ opacity: 0, height: 0 }}
-              className="mt-4"
+        className="fixed inset-0 bg-black/30 backdrop-blur-sm"
+        variants={overlayVariants}
+        initial="hidden"
+        animate="visible"
+        exit="hidden"
+      />
+
+      <div className="fixed inset-0 flex items-center justify-center p-4">
+        <motion.div
+          variants={modalVariants}
+          initial="hidden"
+          animate="visible"
+          exit="hidden"
+          className="relative bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+        >
+          <div className="p-6 sm:p-8">
+            <button
+              onClick={onClose}
+              className="absolute top-4 right-4 text-gray-400 hover:text-gray-500 transition-colors"
             >
-              <h3 className="font-semibold mb-2">Alternative Courses</h3>
-              {course.alternatives.map((alt, index) => (
-                <div key={index} className="bg-gray-100 p-3 rounded mb-2">
-                  <p className="font-semibold">{alt.name}</p>
-                  <p>Provider: {alt.provider}</p>
-                  <p>Cost: {alt.cost}</p>
+              <X className="h-6 w-6" />
+            </button>
+
+            <div className="flex items-center gap-3 mb-6">
+              <div className="px-3 py-1 rounded-full bg-yellow-100 text-yellow-700 text-sm font-medium">
+                {course.field}
+              </div>
+              <div className="flex items-center gap-1 text-yellow-500">
+                <Star className="h-5 w-5 fill-yellow-500" />
+                <span className="font-semibold text-lg">{course.rating.toFixed(1)}</span>
+              </div>
+            </div>
+
+            <h2 className="text-2xl font-semibold text-gray-800 mb-4">{course.name}</h2>
+            <p className="text-gray-600 mb-6 leading-relaxed">{course.description}</p>
+
+            <div className="grid grid-cols-2 gap-6 mb-8">
+              <div className="flex items-center gap-3">
+                <Clock className="h-6 w-6 text-yellow-500" />
+                <div>
+                  <p className="text-sm text-gray-500">Duration</p>
+                  <p className="font-medium text-gray-800">{course.duration}</p>
                 </div>
-              ))}
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </motion.div>
-    </motion.div>
+              </div>
+              <div className="flex items-center gap-3">
+                <Building2 className="h-6 w-6 text-yellow-500" />
+                <div>
+                  <p className="text-sm text-gray-500">Provider</p>
+                  <p className="font-medium text-gray-800">{course.provider}</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3">
+                <IndianRupee className="h-6 w-6 text-yellow-500" />
+                <div>
+                  <p className="text-sm text-gray-500">Cost</p>
+                  <p className="font-medium text-yellow-600">₹{course.cost.toLocaleString('en-IN')}</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3">
+                <Brain className="h-6 w-6 text-yellow-500" />
+                <div>
+                  <p className="text-sm text-gray-500">Learning Style</p>
+                  <p className="font-medium text-gray-800 capitalize">{course.learningStyle}</p>
+                </div>
+              </div>
+            </div>
+
+            <Button
+              className="w-full bg-yellow-500 hover:bg-yellow-600 text-white"
+            >
+              Enroll Now
+            </Button>
+          </div>
+        </motion.div>
+      </div>
+    </Dialog>
   )
 }
 

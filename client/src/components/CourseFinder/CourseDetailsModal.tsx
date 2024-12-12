@@ -40,7 +40,7 @@ export function CourseDetailsModal({ course, onClose }: CourseDetailsModalProps)
             </div>
             <div>
               <h3 className="font-semibold text-gray-700">Cost</h3>
-              <p>${course.cost.toLocaleString()}</p>
+              <p>₹{course.cost.toLocaleString('en-IN')}</p>
             </div>
             <div>
               <h3 className="font-semibold text-gray-700">Duration</h3>

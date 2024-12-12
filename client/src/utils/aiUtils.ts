@@ -1,6 +1,8 @@
 import { GoogleGenerativeAI, HarmBlockThreshold, HarmCategory, SchemaType } from '@google/generative-ai'
 import { CareerInfo, QuestionData, Recommendations } from '../types'
 import { initialEdges, initialNodes } from '@/data/mindmap-data'
+import { useEffect } from 'react'
+import { api } from '@/services/axios'
 
 const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY as string
 if (!GEMINI_API_KEY) {
@@ -331,7 +333,7 @@ export async function generateRecommendations(careerPath: string, financialCondi
   Career Path: ${careerPath}
   Financial Condition: ${financialCondition}
   
-  Provide a detailed analysis and at least 5 professional course in India (government recognized degrees / courses / etc), dont tell any online courese!, recommendations (such as B.Tech, M.Tech, MD, MBBS, etc.) based on the user's career path and financial condition. Give amount of money required for course in Indian rupees. Ensure the courses are diverse and align with different aspects of the career path. Include specific financial fit assessments for each course and provide alternatives.`
+  Provide a detailed analysis and at least 5 professional course in India (government recognized degrees / courses / etc), dont tell any online courese!, recommendations (such as B.Tech, M.Tech, MD, MBBS, etc.) based on the user's career path and financial condition. Give amount of money required for course in Indian rupees. Ensure the courses are diverse and align with different aspects of the career path. Include specific financial fit assessments for each course and provide alternatives. TELL COST FOR INDIAN COURSES, INDIAN. IN INDIAN RUPEES`
 
   try {
     const result = await model.generateContent(prompt)

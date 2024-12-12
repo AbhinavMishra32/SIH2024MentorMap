@@ -6,21 +6,21 @@ const router = Router();
 
 router.get('/', async (req: ReqWithUser, res: Response) => {
     try {
-        const counsellors = await prisma.counsellor.findMany(
-            {
-                include: {
-                    chats: { where: { studentId: req.addedUser.id } },
-                },
-                where: {
-                    isVerified: true
-                }
+        const counsellors = await prisma.counsellor.findMany({
+            include: {
+                chats: { where: { studentId: req.addedUser.id } },
+            },
+            where: {
+                isVerified: true
             }
-        ); // later on we could add isApproved filter here
+        });
 
         const chattingCounsellors = counsellors.map((counsellor: any) => ({
             ...counsellor,
-            isChattingWithStudent: counsellor.chats.length > 0
+            isChattingWithStudent: counsellor.chats.length > 0,
+            chatId: counsellor.chats.length > 0 ? counsellor.chats[0].id : null
         }));
+
         res.status(200).json({
             success: true,
             counsellors: chattingCounsellors
@@ -32,9 +32,67 @@ router.get('/', async (req: ReqWithUser, res: Response) => {
             success: false,
             message: "Internal server error"
         });
-
     }
 });
+
+router.get('/all', async (req: ReqWithUser, res: Response) => {
+    try {
+        const counsellors = await prisma.counsellor.findMany({
+            include: {
+                chats: { where: { studentId: req.addedUser.id } },
+            },
+            where: {
+                isVerified: true
+            }
+        });
+
+        const counsellorsWithChatInfo = counsellors.map((counsellor: any) => ({
+            ...counsellor,
+            isChattingWithStudent: counsellor.chats.length > 0,
+            chatId: counsellor.chats.length > 0 ? counsellor.chats[0].id : null
+        }));
+
+        res.status(200).json({
+            success: true,
+            counsellors: counsellorsWithChatInfo
+        });
+    } catch (error) {
+        console.log("Error in counsellor router GET /all : ", error);
+
+        res.status(500).json({
+            success: false,
+            message: "Internal server error"
+        });
+    }
+})
+
+router.get('/me', async (req: ReqWithUser, res: Response) => {
+    try {
+        const user = await prisma.counsellor.findUnique({
+            where: {
+                id: req.addedUser.id
+            }
+        });
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: "User not found"
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            user
+        });
+    } catch (error) {
+        console.log("Error in counsellor router GET /me : ", error);
+        res.status(500).json({
+            success: false,
+            message: "Internal server error"
+        });
+    }
+})
 
 router.get('/:id', async (req: ReqWithUser, res: Response) => {
     try {

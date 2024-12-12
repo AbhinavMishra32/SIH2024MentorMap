@@ -56,36 +56,36 @@ export default function Home() {
           <motion.form
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-white rounded-xl shadow-sm p-6 mb-8"
+            className="bg-white rounded-xl shadow-lg p-8 mb-8"
             onSubmit={handleSubmit}
           >
-            <div className="space-y-4">
+            <div className="space-y-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Career Path
-                </label>
-                <Input
-                  value={careerPath}
-                  onChange={(e) => setCareerPath(e.target.value)}
-                  placeholder="Describe your desired career path"
-                  className="w-full"
-                  required
-                />
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Career Path
+          </label>
+          <Input
+            value={careerPath}
+            onChange={(e) => setCareerPath(e.target.value)}
+            placeholder="Describe your desired career path"
+            className="w-full border-gray-300 rounded-md shadow-sm focus:border-yellow-500 focus:ring focus:ring-yellow-200 focus:ring-opacity-50"
+            required
+          />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Financial Condition
-                </label>
-                <Input
-                  value={financialCondition}
-                  onChange={(e) => setFinancialCondition(e.target.value)}
-                  placeholder="Describe your financial situation"
-                  className="w-full"
-                  required
-                />
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Financial Condition
+          </label>
+          <Input
+            value={financialCondition}
+            onChange={(e) => setFinancialCondition(e.target.value)}
+            placeholder="Describe your financial situation"
+            className="w-full border-gray-300 rounded-md shadow-sm focus:border-yellow-500 focus:ring focus:ring-yellow-200 focus:ring-opacity-50"
+            required
+          />
               </div>
-              <Button type="submit" className="w-full bg-yellow-500 hover:bg-yellow-600">
-                Find Courses
+              <Button type="submit" className="w-full bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-2 rounded-md shadow-sm transition duration-300 ease-in-out transform hover:scale-105">
+          Find Courses
               </Button>
             </div>
           </motion.form>
@@ -125,7 +125,7 @@ export default function Home() {
                       Very High Potential
                     </span>
                     <span className="px-2 py-1 bg-gray-100 text-gray-600 rounded-full text-sm">
-                      ${course.cost.toLocaleString()}
+                        ₹{course.cost.toLocaleString("en-IN")}
                     </span>
                   </div>
                   

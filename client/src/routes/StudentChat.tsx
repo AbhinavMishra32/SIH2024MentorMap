@@ -1,6 +1,6 @@
 import { motion, useScroll, useTransform } from "framer-motion"
 import { useState, useRef, useEffect } from "react"
-import { ArrowLeft, Send, Paperclip, Smile, MoreVertical, Star } from 'lucide-react'
+import { ArrowLeft, Send, Paperclip, Smile, MoreVertical, Star, Mic } from 'lucide-react'
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge"
 import { api } from "@/services/axios"
 import { Cookies } from "react-cookie"
 import PageLoading from "@/components/PageLoading"
+import { useSpeechRecognition } from "react-speech-kit"
 
 import { io } from 'socket.io-client';
 
@@ -57,6 +58,7 @@ export default function StudentChat() {
     const avatarScale = useTransform(scrollY, [0, 200], [1, 0.8])
     const bioOpacity = useTransform(scrollY, [0, 50], [1, 0])
     const specialitiesOpacity = useTransform(scrollY, [0, 100], [1, 0])
+    const [isListening, setIsListening] = useState(false);
     const [chat, setChat] = useState();
     const [messages, setMessages] = useState<Message[]>([]);
     const [counsellor, setCounsellor] = useState<Counsellor>();
@@ -133,6 +135,14 @@ export default function StudentChat() {
             }, 100);
         }
     }, [messages]);
+
+    const { listen, stop } = useSpeechRecognition({
+        onResult: (result) => {
+            if (counsellor) {
+                setNewMessage({ content: result, senderId: userId, receiverId: counsellor.id, chatId: chatId as string, createdAt: new Date().toISOString(), sender: "user" });
+            }
+        }
+    });
 
     if (loading) {
         return <PageLoading />
@@ -223,18 +233,27 @@ export default function StudentChat() {
                                 setNewMessage({ content: e.target.value, senderId: userId, receiverId: counsellor.id, chatId: chatId as string, createdAt: new Date().toISOString(), sender: "user" });
                             }
                         }}
-                        placeholder="Type your message..."
-                        className="flex-1"
                     />
-                    <Button variant="ghost" size="icon">
-                        <Smile className="h-5 w-5" />
-                        <span className="sr-only">Insert emoji</span>
-                    </Button>
                     <Button
                         onClick={sendMessage}
                         className="bg-yellow-400 hover:bg-yellow-500 text-white">
                         <Send className="h-4 w-4" />
                         <span className="sr-only">Send message</span>
+                    </Button>
+                    <Button
+                        onClick={() => {
+                            if (isListening) {
+                                stop();
+                            } else {
+                                listen();
+                            }
+                            setIsListening(!isListening);
+                        }}
+                        variant="ghost"
+                        size="icon"
+                    >
+                        <Mic className={`h-5 w-5 ${isListening ? 'text-red-500' : ''}`} />
+                        <span className="sr-only">Record message</span>
                     </Button>
                 </div>
             </motion.div>

@@ -17,6 +17,7 @@ import { api } from "@/services/axios"
 import { title } from "process"
 import { url } from "inspector"
 import { Cookies } from "react-cookie"
+import { useNavigate } from "react-router-dom"
 
 const studentItems = [
     {
@@ -59,11 +60,11 @@ const studentItems = [
         url: "/careerai",
         icon: Lightbulb,
     },
-    // {
-    //     title: "Exlore Careers",
-    //     url: "/explore",
-    //     icon: Briefcase,
-    // },
+    {
+        title: "Exlore Careers",
+        url: "/explore",
+        icon: Briefcase,
+    },
     {
         title: "AI Counsellor",
         url: "/ai",
@@ -132,6 +133,29 @@ export function SdSidebar() {
             console.log(error);
         }
     }, [])
+    const navigate = useNavigate();
+
+    const handleSidebarClick = (index: number) => {
+        const items = user?.accountType === 'student' ? studentItems : counsellorItems;
+        if (index < items.length) {
+            navigate(items[index].url);
+        }
+    };
+
+    useEffect(() => {
+        const handleKeyDown = (event: KeyboardEvent) => {
+            if (event.key >= '1' && event.key <= '9') {
+                const index = parseInt(event.key, 10) - 1;
+                handleSidebarClick(index);
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+
+        return () => {
+            window.removeEventListener('keydown', handleKeyDown);
+        };
+    }, [user]);
 
     return (
         <>
@@ -142,9 +166,9 @@ export function SdSidebar() {
                         <SidebarGroupContent>
                             {!loadingUser && (
                                 <SidebarMenu>
-                                    {(user?.accountType === 'student' ? studentItems : counsellorItems).map((item) => (
+                                    {(user?.accountType === 'student' ? studentItems : counsellorItems).map((item, index) => (
                                         <SidebarMenuItem key={item.title} className="px-1">
-                                            <SidebarMenuButton asChild isActive={url === item.url || (item.url !== '/' && url.startsWith(item.url) && !url.startsWith(`${item.url}training`))} className="py-5 pl-4 rounded-xl">
+                                            <SidebarMenuButton asChild isActive={url === item.url || (item.url !== '/' && url.startsWith(item.url) && !url.startsWith(`${item.url}training`))} className="py-5 pl-4 rounded-xl" onClick={() => handleSidebarClick(index)}>
                                                 <a href={item.url}>
                                                     <item.icon />
                                                     <span>{item.title}</span>
