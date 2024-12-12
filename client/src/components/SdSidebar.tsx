@@ -134,17 +134,15 @@ export function SdSidebar() {
         }
     }, [])
     const navigate = useNavigate();
-
     const handleSidebarClick = (index: number) => {
         const items = user?.accountType === 'student' ? studentItems : counsellorItems;
         if (index < items.length) {
             navigate(items[index].url);
         }
     };
-
     useEffect(() => {
         const handleKeyDown = (event: KeyboardEvent) => {
-            if (event.key >= '1' && event.key <= '9') {
+            if (event.key >= '1' && event.key <= '9' && !url.includes('/counselling/chat')) {
                 const index = parseInt(event.key, 10) - 1;
                 handleSidebarClick(index);
             }
@@ -155,7 +153,7 @@ export function SdSidebar() {
         return () => {
             window.removeEventListener('keydown', handleKeyDown);
         };
-    }, [user]);
+    }, [user, url]);
 
     return (
         <>
@@ -185,6 +183,7 @@ export function SdSidebar() {
                     <SidebarMenu>
                         <SidebarMenuItem>
                             <DropdownMenu>
+                                <DropdownMenuTrigger asChild></DropdownMenuTrigger>
                                 <DropdownMenuTrigger asChild>
                                     <SidebarMenuButton>
                                         <User2 /> {user?.username}
