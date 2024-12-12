@@ -117,6 +117,19 @@ export default function StudentChat() {
             socket.off('receiveMessage');
         };
     }, []);
+    useEffect(() => {
+        socket.on('receiveMessage', (data) => {
+            console.log('Message received: ', data);
+            setMessages(prevMessages => [...prevMessages, data]);
+
+            const utterance = new SpeechSynthesisUtterance(data.content);
+            window.speechSynthesis.speak(utterance);
+        });
+
+        return () => {
+            socket.off('receiveMessage');
+        };
+    }, []);
 
     const sendMessage = () => {
         if (newMessage) {
