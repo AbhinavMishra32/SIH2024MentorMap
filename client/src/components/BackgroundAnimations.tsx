@@ -17,6 +17,15 @@ export function BackgroundAnimation() {
 
     const particles: Particle[] = []
     const particleCount = 50
+    const colors = [
+      'rgba(255, 0, 0, 0.5)',    // Red
+      'rgba(255, 165, 0, 0.5)',  // Orange
+      'rgba(255, 255, 0, 0.5)',  // Yellow
+      'rgba(0, 255, 0, 0.5)',    // Green
+      'rgba(255, 182, 193, 0.5)',// Light Pink
+      'rgba(173, 216, 230, 0.5)',// Light Blue
+      'rgba(240, 230, 140, 0.5)' // Light Yellow
+    ]
 
     class Particle {
       x: number
@@ -24,6 +33,7 @@ export function BackgroundAnimation() {
       size: number
       speedX: number
       speedY: number
+      color: string
 
       constructor() {
         this.x = Math.random() * canvas.width
@@ -31,6 +41,7 @@ export function BackgroundAnimation() {
         this.size = Math.random() * 5 + 1
         this.speedX = Math.random() * 3 - 1.5
         this.speedY = Math.random() * 3 - 1.5
+        this.color = colors[Math.floor(Math.random() * colors.length)]
       }
 
       update() {
@@ -44,8 +55,8 @@ export function BackgroundAnimation() {
       }
 
       draw() {
-        ctx.fillStyle = 'rgba(255, 223, 0, 0.2)'
-        ctx.strokeStyle = 'rgba(255, 223, 0, 0.5)'
+        ctx.fillStyle = this.color
+        ctx.strokeStyle = this.color.replace('0.5)', '0.8)')
         ctx.lineWidth = 2
 
         ctx.beginPath()
@@ -75,7 +86,7 @@ export function BackgroundAnimation() {
 
           if (distance < 100) {
             ctx.beginPath()
-            ctx.strokeStyle = `rgba(255, 223, 0, ${1 - distance / 100})`
+            ctx.strokeStyle = `rgba(255, 255, 255, ${1 - distance / 100})`
             ctx.lineWidth = 1
             ctx.moveTo(particles[i].x, particles[i].y)
             ctx.lineTo(particles[j].x, particles[j].y)
@@ -96,8 +107,15 @@ export function BackgroundAnimation() {
     init()
     animate()
 
+    const handleResize = () => {
+      canvas.width = window.innerWidth
+      canvas.height = window.innerHeight
+    }
+
+    window.addEventListener('resize', handleResize)
+
     return () => {
-      // Cleanup function
+      window.removeEventListener('resize', handleResize)
       cancelAnimationFrame(animate)
     }
   }, [])

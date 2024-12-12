@@ -6,16 +6,141 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
 import { Input } from "@/components/ui/input"
-import VideoRecorder from '../components/InterviewPrep/VideoRecorder';
-import FinalAnalysis from '../components/InterviewPrep/FinalAnalysis';
-import AnimatedAnalysis from '../components/InterviewPrep/AnimatedAnalysis';
 import { GoogleGenerativeAI, SchemaType } from '@google/generative-ai';
 import { api } from '@/services/axios';
+import { BackgroundAnimation } from '@/components/BackgroundAnimations';
 
 const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY as string
 if (!GEMINI_API_KEY) {
     throw new Error("Missing GEMINI_API_KEY in environment variables")
 }
+
+// Animated background component
+const AnimatedBackground = () => (
+  <div className="fixed inset-0 z-[-1] overflow-hidden bg-gradient-to-br from-yellow-100 to-white">
+    {[...Array(50)].map((_, i) => (
+      <motion.div
+        key={i}
+        className="absolute rounded-full bg-yellow-300 mix-blend-multiply opacity-30"
+        style={{
+          width: Math.random() * 100 + 20,
+          height: Math.random() * 100 + 20,
+        }}
+        animate={{
+          x: [Math.random() * window.innerWidth, Math.random() * window.innerWidth],
+          y: [Math.random() * window.innerHeight, Math.random() * window.innerHeight],
+          scale: [1, 1.2, 1],
+        }}
+        transition={{
+          duration: Math.random() * 20 + 10,
+          repeat: Infinity,
+          repeatType: "reverse",
+        }}
+      />
+    ))}
+  </div>
+);
+
+// VideoRecorder Component
+const VideoRecorder = ({ isRecording, setIsRecording, onVideoReady }) => {
+    const toggleRecording = () => {
+        setIsRecording(!isRecording);
+        // Implement actual video recording logic here
+    };
+
+    return (
+        <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.5 }}
+            className="flex justify-center"
+        >
+            <motion.button
+                whileHover={{ scale: 1.05, boxShadow: "0px 0px 15px rgba(255,204,0,0.5)" }}
+                whileTap={{ scale: 0.95 }}
+                className={`${
+                    isRecording ? 'bg-red-500' : 'bg-yellow-500'
+                } text-white font-bold py-3 px-6 rounded-full transition-all duration-300 ease-in-out text-lg`}
+                onClick={toggleRecording}
+            >
+                {isRecording ? 'Stop Recording' : 'Start Recording'}
+            </motion.button>
+        </motion.div>
+    );
+};
+
+// AnimatedAnalysis Component
+const AnimatedAnalysis = ({ analysis, isAnalyzing, onNextQuestion }) => {
+    const TypewriterText = ({ text }) => {
+        const [displayedText, setDisplayedText] = useState('');
+    
+        useEffect(() => {
+            let index = 0;
+            const interval = setInterval(() => {
+                if (index < text.length) {
+                    setDisplayedText((prev) => prev + text[index]);
+                    index++;
+                } else {
+                    clearInterval(interval);
+                }
+            }, 30);
+    
+            return () => clearInterval(interval);
+        }, [text]);
+    
+        return <motion.p className="text-lg leading-relaxed">{displayedText}</motion.p>;
+    };
+
+    return (
+        <div className="mt-6">
+            {analysis && (
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5 }}
+                    className="bg-white rounded-lg p-6 shadow-lg"
+                >
+                    <h3 className="text-2xl font-semibold mb-4 text-yellow-600">Analysis:</h3>
+                    <TypewriterText text={analysis} />
+                </motion.div>
+            )}
+            <motion.button
+                whileHover={{ scale: 1.05, boxShadow: "0px 0px 15px rgba(255,204,0,0.5)" }}
+                whileTap={{ scale: 0.95 }}
+                className="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-3 px-6 rounded-full transition-all duration-300 ease-in-out mt-6 text-lg w-full"
+                onClick={onNextQuestion}
+                animate={{
+                    y: [0, -5, 0],
+                    transition: { duration: 2, repeat: Infinity, repeatType: 'loop' },
+                }}
+            >
+                Next Question
+            </motion.button>
+        </div>
+    );
+};
+
+// FinalAnalysis Component
+const FinalAnalysis = ({ analysis }) => {
+    return (
+        <Card className="bg-white/90 shadow-xl rounded-3xl overflow-hidden backdrop-filter backdrop-blur-lg">
+            <CardHeader className="bg-yellow-100 border-b border-yellow-200">
+                <CardTitle className="text-3xl font-bold text-yellow-800">Final Analysis</CardTitle>
+            </CardHeader>
+            <CardContent className="p-8">
+                <motion.p 
+                    className="text-xl leading-relaxed text-gray-700"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 1 }}
+                >
+                    {analysis}
+                </motion.p>
+            </CardContent>
+        </Card>
+    );
+};
 
 const InterviewPrep = () => {
     const [questions, setQuestions] = useState<string[]>([]);
@@ -49,8 +174,6 @@ const InterviewPrep = () => {
                 responseSchema: schema,
             },
         })
-
-        // const prompt = `Generate 5 interview questions for a student counselling website which has an AI interview prep / analysis feature. The questions should check the student's personality, skills, and knowledge about their interests: ${studentInterests}. Start by asking simpler questions related to their name and their life (like normal interviewers (ask whatever you wanna as an interviewer)).Then ask questions that would be asked specifically in that interview / career that the user has chosen, ask only relevant questions related to the interest (but not too deep), dont ask general corporate questions. Infer the potential career paths based on these interests and ask questions as if it were a job interview. The AI should be able to analyze the student's responses and provide feedback.`
 
         const prompt = `Generate 3 questions that tests that test student's knowledge about their interests: ${studentInterests}. And it also tests their personality and skills. The AI should provide exact feedback on the student's responses. Dont ask too long question, use easy words. (school students), dont tell feedback`
 
@@ -115,40 +238,58 @@ const InterviewPrep = () => {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white text-gray-900 py-12">
-            <div className="container mx-auto px-4 max-w-4xl">
-                <h1 className="text-4xl font-bold mb-8 text-center text-gray-800">
+        <div className="min-h-screen w-full relative overflow-hidden">
+            <AnimatedBackground />
+            <BackgroundAnimation/>
+            <div className="container mx-auto px-4 py-12 relative z-10">
+                <motion.h1 
+                    className="text-5xl font-bold mb-12 text-center text-yellow-800"
+                    initial={{ y: -50, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ type: 'spring', stiffness: 100, damping: 10, delay: 0.2 }}
+                >
                     AI Personality Developer
-                </h1>
+                </motion.h1>
 
                 <AnimatePresence mode="wait">
                     {showInterestInput ? (
                         <motion.div
                             key="interest-input"
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: -20 }}
+                            initial={{ opacity: 0, scale: 0.9 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.9 }}
                             transition={{ duration: 0.5 }}
+                            className="max-w-2xl mx-auto"
                         >
-                            <Card className="bg-white shadow-lg rounded-2xl overflow-hidden">
-                                <CardHeader className="bg-gray-50 border-b border-gray-200">
-                                    <CardTitle className="text-2xl font-semibold">What are your interests?</CardTitle>
+                            <Card className="bg-white/90 shadow-xl rounded-3xl overflow-hidden backdrop-filter backdrop-blur-lg">
+                                <CardHeader className="bg-yellow-100 border-b border-yellow-200 p-8">
+                                    <CardTitle className="text-3xl font-bold text-yellow-800">What are your interests?</CardTitle>
                                 </CardHeader>
-                                <CardContent className="p-6">
+                                <CardContent className="p-8">
                                     <Input
                                         type="text"
                                         placeholder="E.g., Computer Science, Art, Biology"
                                         value={studentInterests}
                                         onChange={(e) => setStudentInterests(e.target.value)}
-                                        className="mb-4"
+                                        className="mb-6 text-lg p-4 rounded-xl"
                                     />
-                                    <Button 
+                                    <motion.button
+                                        whileHover={{ scale: 1.05, boxShadow: "0px 0px 15px rgba(255,204,0,0.5)" }}
+                                        whileTap={{ scale: 0.95 }}
+                                        className="w-full bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-4 px-6 rounded-xl transition-all duration-300 ease-in-out text-xl"
                                         onClick={generateQuestions}
                                         disabled={isGeneratingQuestion || !studentInterests}
-                                        className="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-semibold py-2 px-4 rounded-lg transition-all duration: 300 ease-in-out"
                                     >
-                                        {isGeneratingQuestion ? 'Generating Questions...' : 'Start Interview'}
-                                    </Button>
+                                        {isGeneratingQuestion ? (
+                                            <motion.div
+                                                animate={{ rotate: 360 }}
+                                                transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+                                                className="inline-block w-8 h-8 border-t-4 border-b-4 border-white rounded-full"
+                                            />
+                                        ) : (
+                                            'Start Interview'
+                                        )}
+                                    </motion.button>
                                 </CardContent>
                             </Card>
                         </motion.div>
@@ -159,19 +300,20 @@ const InterviewPrep = () => {
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: -20 }}
                             transition={{ duration: 0.5 }}
+                            className="max-w-3xl mx-auto"
                         >
-                            <Card className="bg-white shadow-lg rounded-2xl overflow-hidden">
-                                <CardHeader className="bg-gray-50 border-b border-gray-200">
-                                    <CardTitle className="text-2xl font-semibold">Question {currentQuestionIndex + 1} of {questions.length}</CardTitle>
+                            <Card className="bg-white/90 shadow-xl rounded-3xl overflow-hidden backdrop-filter backdrop-blur-lg">
+                                <CardHeader className="bg-yellow-100 border-b border-yellow-200 p-8">
+                                    <CardTitle className="text-3xl font-bold text-yellow-800">Question {currentQuestionIndex + 1} of {questions.length}</CardTitle>
                                 </CardHeader>
-                                <CardContent className="p-6">
+                                <CardContent className="p-8">
                                     <AnimatePresence mode="wait">
                                         <motion.p
                                             key={currentQuestionIndex}
-                                            className="text-xl mb-6 font-medium text-gray-700"
-                                            initial={{ opacity: 0, y: 20 }}
-                                            animate={{ opacity: 1, y: 0 }}
-                                            exit={{ opacity: 0, y: -20 }}
+                                            className="text-2xl mb-8 font-medium text-gray-700"
+                                            initial={{ opacity: 0, y: 20, rotateX: 90 }}
+                                            animate={{ opacity: 1, y: 0, rotateX: 0 }}
+                                            exit={{ opacity: 0, y: -20, rotateX: -90 }}
                                             transition={{ duration: 0.5 }}
                                         >
                                             {questions[currentQuestionIndex]}
@@ -184,17 +326,26 @@ const InterviewPrep = () => {
                                             onVideoReady={handleVideoUpload}
                                         />
                                     )}
-                                    <AnimatedAnalysis 
+                                    <AnimatedAnalysis
                                         analysis={currentAnalysis}
                                         isAnalyzing={isAnalyzing}
                                         onNextQuestion={handleNextQuestion}
                                     />
                                 </CardContent>
-                                <CardFooter>
-                                    <Progress
-                                        value={((currentQuestionIndex + 1) / questions.length) * 100}
-                                        className="w-full h-2 bg-gray-200"
-                                    />
+                                <CardFooter className="p-8">
+                                    <motion.div
+                                        className="w-full h-4 bg-yellow-100 rounded-full overflow-hidden"
+                                        initial={{ scaleX: 0 }}
+                                        animate={{ scaleX: 1 }}
+                                        transition={{ duration: 0.5 }}
+                                    >
+                                        <motion.div
+                                            className="h-full bg-yellow-500"
+                                            initial={{ width: '0%' }}
+                                            animate={{ width: `${((currentQuestionIndex + 1) / questions.length) * 100}%` }}
+                                            transition={{ duration: 0.5 }}
+                                        />
+                                    </motion.div>
                                 </CardFooter>
                             </Card>
                         </motion.div>
@@ -205,6 +356,7 @@ const InterviewPrep = () => {
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: -20 }}
                             transition={{ duration: 0.5 }}
+                            className="max-w-4xl mx-auto"
                         >
                             <FinalAnalysis analysis={finalAnalysis.analysis} />
                         </motion.div>
