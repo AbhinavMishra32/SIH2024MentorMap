@@ -114,6 +114,7 @@ export function SdSidebar() {
     const url = window.location.pathname;
 
 
+
     useEffect(() => {
         try {
             const fetchUser = async () => {
@@ -141,10 +142,27 @@ export function SdSidebar() {
         }
     };
     useEffect(() => {
-        const handleKeyDown = (event: KeyboardEvent) => {
+        const handleKeyDown = async (event: KeyboardEvent) => {
             if (event.key >= '1' && event.key <= '9' && !url.includes('/counselling/chat')) {
-                const index = parseInt(event.key, 10) - 1;
-                handleSidebarClick(index);
+            const index = parseInt(event.key, 10) - 1;
+            const items = user?.accountType === 'student' ? studentItems : counsellorItems;
+            
+            if (index < items.length && 'speechSynthesis' in window) {
+                // Only speak if speech synthesis is not already speaking
+                if (!window.speechSynthesis.speaking) {
+                try {
+                    const utterance = new SpeechSynthesisUtterance(items[index].title);
+                    utterance.volume = 1;
+                    utterance.rate = 0.9;
+                    utterance.pitch = 1;
+                    window.speechSynthesis.speak(utterance);
+                } catch (error) {
+                    console.error('Speech synthesis failed:', error);
+                }
+                }
+            }
+            
+            handleSidebarClick(index);
             }
         };
 
@@ -152,6 +170,9 @@ export function SdSidebar() {
 
         return () => {
             window.removeEventListener('keydown', handleKeyDown);
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+            }
         };
     }, [user, url]);
 
